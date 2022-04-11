@@ -95,13 +95,15 @@ public class Main {
         String liftId = extract(message, LIFT_ID, WAIT_TIME, 2, 2);
         String waitTime = extract(message, WAIT_TIME, null, 2, 1);
 
-        Map<String, String> map = new HashMap<>();
-        map.put(RESORT_ID, resortId);
-        map.put(SEASON_ID, seasonId);
-        map.put(DAY_ID, dayId);
-        map.put(TIME, time);
-        map.put(LIFT_ID, liftId);
-        map.put(WAIT_TIME, waitTime);
+        // prepare data to be stored in Redis
+        Map<String, Map<String, String>> map = new HashMap<>();
+        String key = skierId + resortId + seasonId; // user skierId+resortId+seasonId as key
+        map.putIfAbsent(key, new HashMap<>());
+        Map<String, String> kv = new HashMap<>();
+        kv.put(DAY_ID, dayId);
+        kv.put(TIME, time);
+        kv.put(LIFT_ID, liftId);
+        kv.put(WAIT_TIME, waitTime);
 
         // adding to redis
         // key is SkierId
@@ -120,15 +122,13 @@ public class Main {
 
     }
     /**
-     * SkierId: [
-     *              {
-     *                time: "",
-     *                liftId: "",
-     *                waitTime: "",
-     *                resortId: "",
-     *                seasonId: "",
-     *                dayId: ""
-     *              }
-     *          ]
+     * SkierId+resortId+seasonId: [
+     *                              {
+     *                                dayId:""
+     *                                time: "",
+     *                                liftId: "",
+     *                                waitTime: "",
+     *                              },
+     *                            ]
      */
 }
