@@ -90,20 +90,19 @@ public class Main {
         String liftId = extract(message, LIFT_ID, WAIT_TIME, 2, 2);
         String waitTime = extract(message, WAIT_TIME, null, 2, 1);
 
-
+        // prepare data to be stored in Redis
         Map<String, String> kv = new HashMap<>();
-        kv.put("skierId", skierId);
-        kv.put("time", time);
-        kv.put("liftId", liftId);
-        kv.put("waitTime", waitTime);
-        kv.put("seasonId", seasonId);
-        kv.put("dayId", dayId);
+        kv.put(SKIER_ID, dayId);
+        kv.put(TIME, time);
+        kv.put(LIFT_ID, liftId);
+        kv.put(WAIT_TIME, waitTime);
 
         // adding to redis
         Gson gson = new Gson();
-        jedis.rpush(resortId, gson.toJson(kv));
+        String key = resortId + seasonId + dayId; // database key
+        jedis.rpush(key, gson.toJson(kv));
         // retrieve data using
-        // lrange resordId 0 -1
+        // lrange key 0 -1
 
     }
 
@@ -118,13 +117,14 @@ public class Main {
 
     }
     /**
-     * resortId :
-     *          { skierId: "",
-     *            time: "",
-     *            liftId: "",
-     *            waitTime:"",
-     *            "seasonId: "",
-     *            "dayId: ""}]
+     * resortId+seasonId+dayId :[
+     *              {
+     *              skierId: "",
+     *              time: "",
+     *              liftId: "",
+     *              waitTime:"",
+     *              }
+     *           ]
      *
      */
 }
