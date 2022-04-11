@@ -96,9 +96,6 @@ public class Main {
         String waitTime = extract(message, WAIT_TIME, null, 2, 1);
 
         // prepare data to be stored in Redis
-        Map<String, Map<String, String>> map = new HashMap<>();
-        String key = skierId + resortId + seasonId; // user skierId+resortId+seasonId as key
-        map.putIfAbsent(key, new HashMap<>());
         Map<String, String> kv = new HashMap<>();
         kv.put(DAY_ID, dayId);
         kv.put(TIME, time);
@@ -106,8 +103,10 @@ public class Main {
         kv.put(WAIT_TIME, waitTime);
 
         // adding to redis
-        // key is SkierId
-        jedis.rpush(skierId, gson.toJson(map));
+        String key = skierId + resortId + seasonId; // database key
+        jedis.rpush(key, gson.toJson(kv));
+        // retrieve data using
+        // lrange key 0 -1
 
     }
 
